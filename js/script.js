@@ -24,13 +24,15 @@ class UI{
         <td>${book.isbn}</td>
         <td><a href="#" class="delete">X</a></td>
         `;
-        list.appendChild(row);
+        
+        list.insertBefore(row, list.firstChild);
 
     }
 
     static removeBookFromBookList(target){
         if(target.hasAttribute("href")){
-            target.parentElement.parentElement.remove(); 
+            target.parentElement.parentElement.remove();  
+            Store.removeBook(target.parentElement.previousElementSibling.textContent.trim());
             UI.showAlert("Book Removed!", "success");
         }
     }
@@ -50,16 +52,6 @@ class UI{
        
     }
 }
-
-
-
-// Add Event Listener
-
-document.addEventListener("DOMContentLoaded", Store.displayBooks());
-form.addEventListener("submit", newBook);
-booklist.addEventListener("click", removeBook);
-
-
 
 
 
@@ -123,8 +115,29 @@ class Store{
         localStorage.setItem("books", JSON.stringify(allBooks));
     }
 
+    static removeBook(isbn){
+        console.log(isbn)
+        let allBooks = Store.getBooks();
+        allBooks.forEach((book, index) =>{
+            if(book.isbn === isbn){
+                allBooks.splice(index, 1);
+            }
+        });
+
+        localStorage.setItem("books", JSON.stringify(allBooks));
+
+    }
+
 
     static displayBooks(){
-        console.log("display books");
+        let getBooks = Store.getBooks();
+        getBooks.forEach(element => {
+            UI.addToBookList(element);
+        });
     }
 }
+
+// Add Event Listener
+form.addEventListener("submit", newBook);
+booklist.addEventListener("click", removeBook);
+document.addEventListener("DOMContentLoaded", Store.displayBooks);
